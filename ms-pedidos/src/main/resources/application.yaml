@@ -10,8 +10,8 @@ spring:
     username: ${DB_USER:postgres}
     password: ${DB_PASSWORD:password}
 
-  servicios:
-    productos-url: ${PRODUCTOS_SERVICE_URL:http://localhost:8081}
+servicios:
+  productos-url: ${PRODUCTOS_SERVICE_URL:http://localhost:8081}
 
 management:
   endpoints:
