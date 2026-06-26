@@ -11,7 +11,8 @@ import pe.edu.vallegrande.mspedidos.domain.model.Pedido;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.time.LocalDateTime;
+import java.math.BigDecimal;
+import java.time.OffsetDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -32,18 +33,24 @@ public class PedidoService implements IPedidoServicePort {
 
     @Override
     public Mono<Pedido> create(Pedido order) {
-        return productoClientPort.findById(order.getProductId())
+        Long productIdLong = Long.valueOf(order.getProductId());
+        return productoClientPort.findById(productIdLong)
                 .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Producto no encontrado")))
                 .flatMap(product -> {
                     if (product.getStock() < order.getQuantity()) {
                         return Mono.error(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Stock insuficiente"));
                     }
 
-                    return productoClientPort.decreaseStock(order.getProductId(), order.getQuantity())
+                    return productoClientPort.decreaseStock(productIdLong, order.getQuantity())
                             .flatMap(updated -> {
-                                order.setTotal(product.getPrice() * order.getQuantity());
+                                BigDecimal total = product.getPrice()
+                                        .multiply(BigDecimal.valueOf(order.getQuantity()));
+                                order.setPrice(product.getPrice());
+                                order.setTotal(total);
                                 order.setStatus("CONFIRMADO");
-                                order.setFecha(LocalDateTime.now());
+                                order.setFecha(OffsetDateTime.now());
+                                order.setCreatedAt(OffsetDateTime.now());
+                                order.setUpdatedAt(OffsetDateTime.now());
                                 return repositoryPort.save(order);
                             });
                 });
@@ -54,6 +61,7 @@ public class PedidoService implements IPedidoServicePort {
         return findById(id)
                 .flatMap(order -> {
                     order.setStatus("CANCELADO");
+                    order.setUpdatedAt(OffsetDateTime.now());
                     return repositoryPort.save(order);
                 });
     }

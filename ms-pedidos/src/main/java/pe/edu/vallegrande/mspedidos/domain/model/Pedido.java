@@ -3,10 +3,13 @@ package pe.edu.vallegrande.mspedidos.domain.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
-import java.time.LocalDateTime;
+import java.math.BigDecimal;
+import java.time.OffsetDateTime;
 
 @Data
 @NoArgsConstructor
@@ -15,12 +18,23 @@ import java.time.LocalDateTime;
 public class Pedido {
     @Id
     private Long id;
-    private Long productId;
+
+    @Column("product_id")
+    private String productId;
+
     private Integer quantity;
-    private Double total;
-    private Double price;
+
+    private BigDecimal price;
+
+    private BigDecimal total;
+
     private String status;
-    private LocalDateTime fecha;
 
+    private OffsetDateTime fecha;
 
+    @Column("created_at")
+    private OffsetDateTime createdAt;
+
+    @Column("updated_at")
+    private OffsetDateTime updatedAt;
 }
