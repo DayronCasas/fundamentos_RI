@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ms-productos
+  labels:
+    app: ms-productos
+spec:
+  # ClusterIP permite que ms-pedidos se comunique internamente por DNS:
+  #   http://ms-productos:8081
+  type: ClusterIP
+  selector:
+    app: ms-productos
+  ports:
+    - name: http
+      protocol: TCP
+      port: 8081        # puerto expuesto dentro del cluster
+      targetPort: 8081  # puerto del contenedor

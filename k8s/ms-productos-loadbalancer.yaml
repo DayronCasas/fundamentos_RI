@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ms-productos-lb
+  labels:
+    app: ms-productos
+spec:
+  # LoadBalancer expone ms-productos al exterior (útil para pruebas locales con minikube tunnel)
+  type: LoadBalancer
+  selector:
+    app: ms-productos
+  ports:
+    - name: http
+      protocol: TCP
+      port: 8081
+      targetPort: 8081

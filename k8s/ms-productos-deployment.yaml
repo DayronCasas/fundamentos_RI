@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ms-productos
+  labels:
+    app: ms-productos
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ms-productos
+  template:
+    metadata:
+      labels:
+        app: ms-productos
+    spec:
+      containers:
+        - name: ms-productos
+          image: dayroncasas/ms-productos:latest
+          ports:
+            - containerPort: 8081
+          env:
+            # ── Puerto del servidor (variable de configuración) ──────────────
+            - name: SERVER_PORT
+              value: "8081"
+            # ── Base de datos (Supabase) ─────────────────────────────────────
+            - name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: DB_HOST
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_NAME
+              value: "postgres"
+            - name: DB_SSL_MODE
+              value: "require"
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: DB_USER
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: DB_PASSWORD
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8081
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8081
+            initialDelaySeconds: 30
+            periodSeconds: 15
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"

@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ms-pedidos-lb
+  labels:
+    app: ms-pedidos
+spec:
+  # LoadBalancer expone ms-pedidos al exterior
+  type: LoadBalancer
+  selector:
+    app: ms-pedidos
+  ports:
+    - name: http
+      protocol: TCP
+      port: 8082
+      targetPort: 8082
